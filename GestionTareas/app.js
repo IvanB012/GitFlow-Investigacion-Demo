@@ -78,6 +78,74 @@ function cargarDesdeStorage() {
     }
 }
 
-// ------------------------------------------------------------
-//  Funciones principales — se implementarán en los siguientes pasos
-// ------------------------------------------------------------
+// ============================================================
+//  INTERFAZ — Renderizado y contador
+// ============================================================
+
+/**
+ * Actualiza el texto del elemento `contador` en el DOM.
+ *
+ * Calcula el total de tareas del arreglo y cuántas siguen
+ * pendientes (completada === false), luego escribe el resultado
+ * con el formato "Total: X | Pendientes: Y".
+ * Se llama automáticamente al final de renderizarLista() para
+ * mantener el contador siempre sincronizado con la lista.
+ */
+function actualizarContador() {
+    const total      = tareas.length;
+    const pendientes = tareas.filter(t => !t.completada).length;
+
+    contador.textContent = `Total: ${total} | Pendientes: ${pendientes}`;
+}
+
+/**
+ * Reconstruye por completo la lista visual de tareas en el DOM.
+ *
+ * Estrategia: vaciado + recreación desde cero (simple y predecible).
+ * Por cada objeto del arreglo `tareas` crea un <li> que contiene:
+ *   - Un <span> con el texto; al hacer clic llama a toggleCompletar()
+ *     para alternar el estado completada/pendiente.
+ *   - Un <button class="btn-eliminar"> que llama a eliminarTarea()
+ *     para quitar la tarea del arreglo y del DOM.
+ * El <li> recibe la clase CSS correcta según el estado de la tarea.
+ * Al finalizar el bucle invoca actualizarContador().
+ *
+ * Nota: toggleCompletar() y eliminarTarea() se implementarán
+ * en los siguientes pasos; están referenciadas aquí para
+ * establecer el contrato de la interfaz desde ya.
+ */
+function renderizarLista() {
+    // Vaciar el contenido actual para evitar duplicados
+    listaTareas.innerHTML = '';
+
+    tareas.forEach(tarea => {
+        // --- Crear el elemento raíz de la tarjeta ---
+        const li = document.createElement('li');
+        li.classList.add(tarea.completada ? 'tarea-completada' : 'tarea-pendiente');
+
+        // --- Span con el texto de la tarea ---
+        const span = document.createElement('span');
+        span.textContent = tarea.texto;
+
+        // Al hacer clic en el texto se alterna el estado de la tarea.
+        // toggleCompletar se implementará en el siguiente paso.
+        span.addEventListener('click', () => toggleCompletar(tarea.id));
+
+        // --- Botón para eliminar la tarea ---
+        const btnEliminar = document.createElement('button');
+        btnEliminar.textContent = 'Eliminar';
+        btnEliminar.classList.add('btn-eliminar');
+
+        // Al hacer clic se elimina la tarea del arreglo y del DOM.
+        // eliminarTarea se implementará en el siguiente paso.
+        btnEliminar.addEventListener('click', () => eliminarTarea(tarea.id));
+
+        // --- Ensamblar y añadir al DOM ---
+        li.appendChild(span);
+        li.appendChild(btnEliminar);
+        listaTareas.appendChild(li);
+    });
+
+    // Mantener el contador sincronizado tras cada renderizado
+    actualizarContador();
+}
