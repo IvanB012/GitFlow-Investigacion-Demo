@@ -228,3 +228,44 @@ function eliminarTarea(id) {
     guardarEnStorage();
     renderizarLista();
 }
+
+// ============================================================
+//  EVENT LISTENERS — Conexión entre el DOM y la lógica
+// ============================================================
+
+/**
+ * Clic en el botón "Agregar":
+ * Dispara agregarTarea() cada vez que el usuario presiona el botón.
+ */
+btnAgregar.addEventListener('click', agregarTarea);
+
+/**
+ * Tecla Enter en el campo de texto:
+ * Permite agregar una tarea sin usar el ratón, mejorando la
+ * accesibilidad y la experiencia de usuario en teclado.
+ * Se verifica event.key en lugar de keyCode (obsoleto).
+ */
+campoTarea.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        agregarTarea();
+    }
+});
+
+// ============================================================
+//  INICIALIZACIÓN — Punto de entrada al cargar el script
+// ============================================================
+
+/**
+ * Secuencia de arranque de la aplicación.
+ *
+ * 1. cargarDesdeStorage(): restaura el arreglo `tareas` con los
+ *    datos guardados en localStorage (si los hay).
+ * 2. renderizarLista(): construye la lista visual en el DOM y
+ *    actualiza el contador, mostrando el estado persistido.
+ *
+ * Este bloque se ejecuta de forma síncrona al terminar de
+ * parsear el script (ubicado al final del <body>), garantizando
+ * que todos los elementos del DOM ya existen en ese momento.
+ */
+cargarDesdeStorage();
+renderizarLista();
