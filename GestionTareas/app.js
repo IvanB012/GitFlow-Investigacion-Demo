@@ -149,3 +149,82 @@ function renderizarLista() {
     // Mantener el contador sincronizado tras cada renderizado
     actualizarContador();
 }
+
+// ============================================================
+//  LÓGICA PRINCIPAL — Operaciones sobre el arreglo de tareas
+// ============================================================
+
+/**
+ * Lee el campo de texto, valida que no esté vacío y agrega
+ * una nueva tarea al arreglo `tareas`.
+ *
+ * Cada tarea es un objeto con:
+ *   - id        : timestamp único generado con Date.now()
+ *   - texto     : el valor ingresado por el usuario (sin espacios extra)
+ *   - completada: false por defecto (toda tarea nueva está pendiente)
+ *
+ * Tras modificar el arreglo, persiste los cambios en localStorage,
+ * limpia el campo de texto y actualiza la lista visible en el DOM.
+ * Si el campo está vacío, la función retorna sin hacer nada.
+ */
+function agregarTarea() {
+    const texto = campoTarea.value.trim();
+
+    // Guardia: ignorar entradas vacías o de solo espacios en blanco
+    if (texto === '') return;
+
+    // Construir el objeto de tarea y añadirlo al arreglo
+    const nuevaTarea = {
+        id:         Date.now(), // Identificador único basado en el tiempo
+        texto:      texto,
+        completada: false
+    };
+    tareas.push(nuevaTarea);
+
+    // Persistir, limpiar el input y refrescar la lista
+    guardarEnStorage();
+    campoTarea.value = '';
+    renderizarLista();
+}
+
+/**
+ * Alterna el estado completada/pendiente de la tarea con el id dado.
+ *
+ * Busca en el arreglo `tareas` la tarea cuyo id coincida y niega
+ * su propiedad `completada` (true → false, false → true).
+ * Si no se encuentra ninguna tarea con ese id, no hace nada.
+ * Tras el cambio persiste el estado y reconstruye el DOM.
+ *
+ * @param {number} id - El id único de la tarea a alternar.
+ */
+function toggleCompletar(id) {
+    const tarea = tareas.find(t => t.id === id);
+
+    // Guardia: si el id no corresponde a ninguna tarea, salir
+    if (!tarea) return;
+
+    // Invertir el estado actual
+    tarea.completada = !tarea.completada;
+
+    guardarEnStorage();
+    renderizarLista();
+}
+
+/**
+ * Elimina permanentemente la tarea con el id dado del arreglo.
+ *
+ * Usa Array.filter para crear un nuevo arreglo que excluye la tarea
+ * con el id recibido y reasigna el resultado a `tareas`.
+ * Este enfoque es inmutable: no muta la posición original, sino que
+ * reemplaza la referencia, lo que evita errores de índice en el bucle.
+ * Tras la eliminación persiste el estado y reconstruye el DOM.
+ *
+ * @param {number} id - El id único de la tarea a eliminar.
+ */
+function eliminarTarea(id) {
+    // Conservar todas las tareas excepto la que tiene el id indicado
+    tareas = tareas.filter(t => t.id !== id);
+
+    guardarEnStorage();
+    renderizarLista();
+}
